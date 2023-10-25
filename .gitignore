@@ -1,4 +1,6 @@
 pkg/man/*
+manual.pdf
+
 
 # History files
 .Rhistory
