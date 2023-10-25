@@ -1,0 +1,13 @@
+Package: synthesizer
+Type: Package
+Title: Concise Summary of What the Package Does
+Version: 0.1
+Date: 2023-10-25
+Author: Mark van der Loo
+Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
+Description: More about what it does (maybe more than one line).
+License: GPL (>= 2)
+Imports: stats, randomForest
+Suggests: tinytest
+Encoding: UTF-8
+RoxygenNote: 7.2.3
