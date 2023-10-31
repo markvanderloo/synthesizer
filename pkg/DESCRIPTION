@@ -1,12 +1,16 @@
 Package: synthesizer
 Type: Package
-Title: Concise Summary of What the Package Does
-Version: 0.1
+Title: Synthesize Data Based On The Emperical Multivariate Distribution
+Version: 0.2
 Date: 2023-10-25
 Author: Mark van der Loo
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
-Description: More about what it does (maybe more than one line).
-License: GPL (>= 2)
+Description: Data is synthesized using a combination of inverse transform
+    sampling from the emperical quantile functions for each variable, and 
+    then copying the rank order structure from the original dataset. The
+    package also includes a number of functions to measure the utility of
+    synthesized datasets.
+License: GPL (>= 3)
 Imports: stats, randomForest
 Suggests: tinytest
 Encoding: UTF-8

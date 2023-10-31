@@ -1,6 +1,3 @@
-#' @importFrom stats approxfun runif
-#'
-NULL
 
 #' Create a function that generates synthetic data
 #'
@@ -26,6 +23,7 @@ NULL
 #' synth(150)
 #' synth(250)
 #'
+#' @family synthesis
 #' @export
 make_synthesizer <- function(y){
   UseMethod("make_synthesizer")
@@ -98,6 +96,7 @@ make_synthesizer.data.frame <- function(y){
 #' synthesize(cars)
 #' synthesize(cars,25)
 #'
+#' @family synthesis
 #' @export
 synthesize <- function(y, n=NROW(y)) make_synthesizer(y)(n) 
 
