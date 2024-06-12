@@ -1,6 +1,6 @@
 Package: synthesizer
 Type: Package
-Title: Synthesize Data Based On The Emperical Multivariate Distribution
+Title: Synthesize Data Based on Emperical Multivariate Distributions and Rank Order Matching
 Version: 0.2
 Date: 2023-10-25
 Author: Mark van der Loo
@@ -12,6 +12,8 @@ Description: Data is synthesized using a combination of inverse transform
     synthesized datasets.
 License: GPL (>= 3)
 Imports: stats, randomForest
-Suggests: tinytest
+VignetteBuilder: simplermarkdown
+Depends: R (>= 3.5.0)
+Suggests: tinytest, simplermarkdown
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1

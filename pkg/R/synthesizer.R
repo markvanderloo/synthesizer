@@ -88,8 +88,8 @@ make_synthesizer.data.frame <- function(y){
 #' Create \code{n} values or records based on the emperical (multivariate)
 #' distribution of \code{y}.
 #'
-#' @param y \code{[vector|data.frame} data to synthesize.
-#' @param n \code{[integer]} NUmber of values or records to synthesize.
+#' @param y \code{[vector|data.frame]} data to synthesize.
+#' @param n \code{[integer]} Number of values or records to synthesize.
 #'
 #' @examples
 #' synthesize(cars$speed,10)
