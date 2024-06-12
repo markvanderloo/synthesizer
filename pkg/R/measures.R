@@ -164,7 +164,7 @@ diff_sd_x <- function(xs, xr, tol, ...){
 dsd <- function(synth, real, tol=1e-8, ...){
   str_check(synth, real)
   i <- sapply(synth, is.numeric)
-  mean(mapply(diff_mean_x, synth[i], real[i],tol=tol, ...))
+  mean(mapply(diff_sd_x, synth[i], real[i],tol=tol, ...))
 }
 
 #' Difference between correlation

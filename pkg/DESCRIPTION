@@ -1,8 +1,8 @@
 Package: synthesizer
 Type: Package
 Title: Synthesize Data Based on Emperical Multivariate Distributions and Rank Order Matching
-Version: 0.2
-Date: 2023-10-25
+Version: 0.2.0
+Date: 2024-06-12
 Author: Mark van der Loo
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
 Description: Data is synthesized using a combination of inverse transform
