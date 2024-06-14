@@ -10,7 +10,8 @@ Description: Data is synthesized using a combination of inverse transform
     then copying the rank order structure from the original dataset. The
     package also includes a number of functions to measure the utility of
     synthesized datasets.
-License: GPL (>= 3)
+License: EUPL
+URL: https://github.com/markvanderloo/synthesizer
 Imports: stats, randomForest
 VignetteBuilder: simplermarkdown
 Depends: R (>= 3.5.0)
