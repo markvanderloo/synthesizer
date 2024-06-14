@@ -1,9 +1,11 @@
 Package: synthesizer
 Type: Package
-Title: Synthesize Data Based on Emperical Multivariate Distributions and Rank Order Matching
-Version: 0.2.0
+Title: Synthesize Data Based on Emperical Quantile Functions and Rank Order Matching
+Version: 0.2.1
 Date: 2024-06-12
-Author: Mark van der Loo
+Authors@R: c( person("Mark", "van der Loo", role=c("aut","cre")
+             , email="mark.vanderloo@gmail.com"
+             , comment= c(ORCID="0000-0002-9807-4686")))
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
 Description: Data is synthesized using a combination of inverse transform
     sampling from the emperical quantile functions for each variable, and 

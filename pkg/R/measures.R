@@ -38,6 +38,8 @@ str_check <- function(synth, real){
 #' @param nrep  \code{[integer]} Number of model repetitions to average the 
 #'              pMSE value over. Ignored for \code{lr}.
 #'
+#' 
+#' @return \code{[numeric]} scalar.
 #'
 #' @examples
 #' scars <- synthesize(cars)
@@ -130,6 +132,7 @@ diff_mean_x <- function(xs, xr, tol, ...){
 #' Real and synthetic data are expected to have the same column names,
 #' orders, and data types.
 #'
+#' @return \code{[numeric]} scalar.
 #'
 #' @examples
 #'

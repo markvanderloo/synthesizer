@@ -60,15 +60,16 @@ synth_iris <- synthesize(iris)
 To compare the datasets we can make some side-by-side scatterplots.
 
 ```{#plot .R  fun=output_figure name="test" caption="Original and Synthesized Iris" device="png" width=800 height=400}
-par(mfrow=c(1,2))
+oldpar <- par(mfrow=c(1,2))
 plot(Sepal.Length ~ Petal.Length, data=iris, col=iris$Species, pch=16,las=1,xlim=c(0,7),ylim=c(4,8),main="Original")
 legend("topleft",legend=levels(iris$Species),col=1:3,pch=16,bty="n")
 plot(Sepal.Length ~ Petal.Length, data=synth_iris, col=iris$Species,pch=16,las=1,xlim=c(0,7),ylim=c(4,8),main="Synthesized")
 legend("topleft",legend=levels(iris$Species),col=1:3,pch=16,bty="n")
+par(oldpar)
 ```
 
 Although the synthesized dataset shows more variance, it does mimic the
-clusture structure of the original dataset.
+clustur structure of the original dataset.
 
 By default, `synthesize` will return a dataset of the same size as the input dataset. However it is
 possible to ask for any number of records.
