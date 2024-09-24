@@ -102,15 +102,12 @@ Given an original dataset with $n$ records:
    cumulative density function (ECDF), and use linear interpolation to interpolate
    between the data points. The observed minimum and maximum are also the minimum
    and maximum of the synthetic univariate distribution. Sample $n$ values using
-   inverse transform sampling with the linear interpolated inverse ECDF
+   inverse transform sampling with the linear interpolated inverse ECDF. 
+   Missing values are taken into account by sampling them proportional to their
+   occurrence.
 2. For each categorical or logical variable, sample $n$ values with replacement.
 3. Reorder the synthetic dataset such that the rank order combinations of the synthetic
-   data match those of the original dataset.
-
-In step 1 and 2, missing values are sorted at the beginning of each vector. In expectation,
-the proportion of missing values in synthetic data matches that of the real data. Rank order
-matching ensures that correlation between missingness and values in other variables are
-preserved as well.
+   data match those of the original dataset. 
 
 If less than $m<n$ records are needed, sample $m$ records uniformly from the dataset just created.
 If $m>n$ records are needed, create $\lceil m/n\rceil$ synthetic datasets of size $m$ and sample

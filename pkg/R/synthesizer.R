@@ -78,9 +78,13 @@ make_synthesizer.character <- function(y){
 #' @export
 make_synthesizer.data.frame <- function(y){
   L  <- lapply(y, make_synthesizer)
-  A  <- lapply(y, order)
+  A  <- lapply(y, order, na.last=FALSE)
   nr <- nrow(y)
-  f <- function() as.data.frame( mapply(function(f,i) sort(f(nr))[i], L, A, SIMPLIFY = FALSE) )
+  f <- function() as.data.frame(
+          mapply(
+            function(synth, ordr) sort(synth(nr), na.last = FALSE)[ordr]
+          , L, A, SIMPLIFY = FALSE
+          ) )
   function(n=nrow(y)){
     out <- f()
     if (n == nr) return(out)
@@ -90,7 +94,7 @@ make_synthesizer.data.frame <- function(y){
       out <- rbind(out, f())
       i <- i + 1
     }
-    out[sample(seq_len(nrow(out)), size=n, replace=FALSE),]
+    out[sample(seq_len(nrow(out)), size=n, replace=FALSE),,drop=FALSE]
   }
 }
 

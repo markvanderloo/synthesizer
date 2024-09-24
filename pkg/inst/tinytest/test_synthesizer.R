@@ -48,6 +48,13 @@ expect_silent(make_synthesizer(c(1,NA,2,NA,NA)))
 expect_equal(synthesize(rep(NA_real_,3)),rep(NA_real_,3))
 expect_equal(synthesize(rep(NA,3)),rep(NA,3))
 
+# test correlation between NA and obserevd values
+rl <-data.frame( x = c(rnorm(50,mean=10), rnorm(50,mean=-10))
+               , y = c(rep(NA_real_,50), rnorm(50)))
+
+sn <- synthesize(rl)
+expect_true(mean(sn$x[is.na(sn$y)]) > mean(sn$x[!is.na(sn$y)]))
+
 
 # test for 'data.frame'
 
