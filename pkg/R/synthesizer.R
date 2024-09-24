@@ -32,7 +32,11 @@ make_synthesizer <- function(y){
 #' @rdname make_synthesizer
 #' @export
 make_synthesizer.numeric <- function(y){
-  ys <- sort(y)
+  if (sum(!is.na(y))<2){
+    return(function(n) rep(NA_real_,n))
+  }
+
+  ys <- sort(y,na.last=FALSE)
   p  <- seq_along(y)/(length(y)+1)
   pmin <- min(p)
   pmax <- max(p)
@@ -47,6 +51,13 @@ make_synthesizer.numeric <- function(y){
 make_synthesizer.integer <- function(y){
   R <- make_synthesizer(as.double(y))
   function(n) as.integer( round(R(n)) )
+}
+
+
+#' @rdname make_synthesizer
+#' @export
+make_synthesizer.logical <- function(y){
+  function(n) sample(y, n, replace=TRUE)
 }
 
 

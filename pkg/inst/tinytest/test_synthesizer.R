@@ -37,6 +37,17 @@ p <- sapply(1:100, function(i) mean(table(y)-table(R(100))) )
 
 expect_true(abs(mean(p)) <= 0.1)
 
+# test for logical
+y <- sample(c(TRUE, FALSE),100, replace=TRUE)
+R <- make_synthesizer(y)
+p <- sapply(1:100, function(i) mean(table(y)-table(R(100))) ) 
+expect_true(abs(mean(p))<= 0.1)
+
+# test that missing data is handled correctly
+expect_silent(make_synthesizer(c(1,NA,2,NA,NA)))
+expect_equal(synthesize(rep(NA_real_,3)),rep(NA_real_,3))
+expect_equal(synthesize(rep(NA,3)),rep(NA,3))
+
 
 # test for 'data.frame'
 

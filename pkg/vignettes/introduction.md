@@ -19,12 +19,13 @@ Use `citation('synthesizer')` to cite the package.
 It also provides a few basic functions based on pMSE to measure some
 utility of the synthesized data.
 
-The package supports numerical, categorical/ordinal, and mixed data.
+The package supports numerical, categorical/ordinal, and mixed data and also
+correctly takes account of missing values.
 
 At the moment the method used seems promising but we are working on
 investigating where the method shines and where it fails. So we have no
 guarantees yet on utility, privacy, and so on. Having said that, our
-preliminary results are promesing, and using the package is very easy.
+preliminary results are promising, and using the package is very easy.
 
 
 ## Installation
@@ -69,7 +70,7 @@ par(oldpar)
 ```
 
 Although the synthesized dataset shows more variance, it does mimic the
-clustur structure of the original dataset.
+cluster structure of the original dataset.
 
 By default, `synthesize` will return a dataset of the same size as the input dataset. However it is
 possible to ask for any number of records.
@@ -97,14 +98,19 @@ Synthetic data is prepared as follows.
 
 Given an original dataset with $n$ records:
 
-1. For each numeric variable in the dataset, determine the emperical inverse
+1. For each numeric variable in the dataset, determine the empirical inverse
    cumulative density function (ECDF), and use linear interpolation to interpolate
    between the data points. The observed minimum and maximum are also the minimum
    and maximum of the synthetic univariate distribution. Sample $n$ values using
    inverse transform sampling with the linear interpolated inverse ECDF
-2. For each categorical variable, sample $n$ values with replacement.
+2. For each categorical or logical variable, sample $n$ values with replacement.
 3. Reorder the synthetic dataset such that the rank order combinations of the synthetic
    data match those of the original dataset.
+
+In step 1 and 2, missing values are sorted at the beginning of each vector. In expectation,
+the proportion of missing values in synthetic data matches that of the real data. Rank order
+matching ensures that correlation between missingness and values in other variables are
+preserved as well.
 
 If less than $m<n$ records are needed, sample $m$ records uniformly from the dataset just created.
 If $m>n$ records are needed, create $\lceil m/n\rceil$ synthetic datasets of size $m$ and sample

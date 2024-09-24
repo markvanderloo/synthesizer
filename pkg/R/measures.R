@@ -1,6 +1,6 @@
 #' @name imports
-#' importFrom randomForest randomForest predict.randomForest
-#' importFrom stats predict
+#' @importFrom randomForest randomForest 
+#' @importFrom stats predict
 NULL
 
 # check if two datasets have the same structure
