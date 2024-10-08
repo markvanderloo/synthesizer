@@ -69,8 +69,6 @@ legend("topleft",legend=levels(iris$Species),col=1:3,pch=16,bty="n")
 par(oldpar)
 ```
 
-Although the synthesized dataset shows more variance, it does mimic the
-cluster structure of the original dataset.
 
 By default, `synthesize` will return a dataset of the same size as the input dataset. However it is
 possible to ask for any number of records.
@@ -83,10 +81,12 @@ dim(more_synth)
 ## Checking quality
 
 The pMSE method is a popular way of measuring the quality of a dataset. The idea is to 
-train a model to predict whether a record is synthetic or not. The mean squared error of prediction
-is the measure, so smaller is better.
+train a model to predict whether a record is synthetic or not. The worse a model can
+do that, the better a synthic data instance resembles the real data. The value scales
+between 0 and 0.25 (if the synthetic and real datasets have the same number of records).
+Smaller is better.
 
-```{.R}
+```{#pMSE .R}
 pmse(synth=synth_iris, real=iris)
 ```
 
