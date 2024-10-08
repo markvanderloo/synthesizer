@@ -78,11 +78,11 @@ make_synthesizer.character <- function(y){
 #' @export
 make_synthesizer.data.frame <- function(y){
   L  <- lapply(y, make_synthesizer)
-  A  <- lapply(y, order, na.last=FALSE)
+  A  <- lapply(y, rank, na.last=FALSE)
   nr <- nrow(y)
   f <- function() as.data.frame(
           mapply(
-            function(synth, ordr) sort(synth(nr), na.last = FALSE)[ordr]
+            function(synth, rnk) sort(synth(nr), na.last = FALSE)[rnk]
           , L, A, SIMPLIFY = FALSE
           ) )
   function(n=nrow(y)){

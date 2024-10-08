@@ -6,7 +6,7 @@
 
 # synthesizer
 
-Create synthetic data based on the Emperical inverse CDFs and Rank Matching
+Create synthetic data based on the Empirical inverse CDFs and Rank Matching
 
 ## Installing
 

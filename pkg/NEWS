@@ -1,3 +1,6 @@
+version 0.3.1
+- fix: bug in rank order matching
+
 version 0.3.0
 - Improved handling of missing values
 - Added support for vectors of type 'logical'
