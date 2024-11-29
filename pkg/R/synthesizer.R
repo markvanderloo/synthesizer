@@ -1,9 +1,8 @@
-
 #' Create a function that generates synthetic data
 #'
 #' Create a function that accepts a non-negative integer \code{n}, and
 #' that returns synthetic data sampled from the emperical (multivariate)
-#' distribution of \code{y}. 
+#' distribution of \code{x}. 
 #' 
 #'
 #'
@@ -74,6 +73,10 @@ make_synthesizer.character <- function(x,...){
   function(n) sample(x, n, replace=TRUE)
 }
 
+# randomize the order of a rank vector until the correlation with the original
+# vecor has dropped below a maximum value.  Orders are randomized by selecting
+# each time at random approximately 1% of the vector and cyclicly permuting the
+# indices. 
 randomize <- function(ranklist, cors){
   if ( all(cors==1) ) return(ranklist)
   
@@ -96,12 +99,9 @@ randomize <- function(ranklist, cors){
     }
     ranklist[[variable]] <- new_rank
   }
-  
+
   ranklist
-
 }
-
-
 
 
 #' @rdname make_synthesizer

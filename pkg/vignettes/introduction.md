@@ -15,12 +15,14 @@ Use `citation('synthesizer')` to cite the package.
 
 ## Introduction
 
-`synthetiser` is an R package for quickly and easily synthesizing data.
-It also provides a few basic functions based on pMSE to measure some
-utility of the synthesized data.
+`synthetiser` is an R package for quickly and easily synthesizing data.  It
+also provides a few basic functions based on pMSE to measure some utility of
+the synthesized data.
 
 The package supports numerical, categorical/ordinal, and mixed data and also
-correctly takes account of missing values.
+correctly takes account of missing values and mixed distributions. A `utility`
+parameter lets you gradually shift between realistic data with high utility 
+and less realistic data with decreased utility.
 
 At the moment the method used seems promising but we are working on
 investigating where the method shines and where it fails. So we have no
@@ -69,9 +71,8 @@ legend("topleft",legend=levels(iris$Species),col=1:3,pch=16,bty="n")
 par(oldpar)
 ```
 
-
-By default, `synthesize` will return a dataset of the same size as the input dataset. However it is
-possible to ask for any number of records.
+By default `synthesize` will return a dataset of the same size as the input
+dataset. However, it is possible to ask for any number of records.
 
 ```{#synthesize_more .R}
 more_synth <- synthesize(iris, n=250)
@@ -80,16 +81,21 @@ dim(more_synth)
 
 ## Checking quality
 
-The pMSE method is a popular way of measuring the quality of a dataset. The idea is to 
-train a model to predict whether a record is synthetic or not. The worse a model can
-do that, the better a synthic data instance resembles the real data. The value scales
-between 0 and 0.25 (if the synthetic and real datasets have the same number of records).
-Smaller is better.
+The pMSE method is a popular way of measuring the quality of a dataset. The
+idea is to train a model to predict whether a record is synthetic or not. The
+worse a model can do that, the better a synthic data instance resembles the
+real data. The value scales between 0 and 0.25 (if the synthetic and real
+datasets have the same number of records).  Smaller is better.
 
 ```{#pMSE .R}
 pmse(synth=synth_iris, real=iris)
 ```
+The package lets you choose between logistic regression (the default) and a
+random forest classifier as the predictive model.
 
+```{#pMSE .R}
+pmse(synth=synth_iris, real=iris, model="rf")
+```
 
 ## Choosing the utility-privacy trade-off
 
@@ -98,9 +104,9 @@ properties of the real entities represented by synthetic data. One way to
 mitigate this is to decorrelate the variables in the synthetic data. For data
 frames, this can be done with the `utility` parameter. Either for all
 variables, or for a selectin of parameters. Setting `utility` to 1 (the
-default) yields the most realistic data, lowering the utility causes loss
-of (linear or nonlinear) correlation between synthetic variables, if there was
-any in the real data. 
+default) yields the most realistic data, lowering the utility causes loss of
+(linear or nonlinear) correlation between synthetic variables, if there was any
+in the real data. 
 ```{#decorrelate .R}
 # decorrelate rank matching to 0.5
 s1 <- synthesize(iris, utility=0.5)
@@ -121,8 +127,6 @@ dataset, where all variables are decorrelated. Both the geometric clustering
 and the species are now garbled. In the right figure we only decorrelate the
 Species variable. Here, the spatial clustering is retained while the
 correlation between color (Species) and location is lost.
-
-
 
 
 
