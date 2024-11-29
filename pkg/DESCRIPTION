@@ -7,10 +7,11 @@ Authors@R: c( person("Mark", "van der Loo", role=c("aut","cre")
              , comment= c(ORCID="0000-0002-9807-4686")))
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
 Description: Data is synthesized using a combination of inverse transform
-    sampling from the empirical quantile functions for each variable, and 
+    sampling using the empirical quantile functions for each variable, and 
     then copying the rank order structure from the original dataset. The
-    package also includes a number of functions to measure the utility of
-    synthesized datasets.
+    syntesizer method has a tunable parameter allowing to gradually move
+    from realistic and possibly unsafe synthetic data to decorrelated data
+    of less utility.
 License: EUPL
 URL: https://github.com/markvanderloo/synthesizer
 Imports: stats, randomForest
