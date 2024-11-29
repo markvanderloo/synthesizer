@@ -64,12 +64,12 @@ expect_equal(dim(make_synthesizer(iris)(250)), c(250,5))
 
 # test with lowered correlations
 d <- data.frame(x=1:100, y=1:100, z=1:100)
-s <- synthesize(d,correlations=0.5)
+s <- synthesize(d,utility=0.5)
 expect_true(cor(s$x,s$y)<0.5)
 expect_true(cor(s$x,s$z)<0.5)
 expect_true(cor(s$y,s$z)<0.5)
 
-s1 <- synthesize(d, correlations=c("z"=0.5))
+s1 <- synthesize(d, utility=c("z"=0.5))
 expect_true(cor(s$x,s$z)<=0.5)
 expect_true(cor(s$y,s$z)<=0.5)
 

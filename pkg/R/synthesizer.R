@@ -7,7 +7,7 @@
 #' 
 #'
 #'
-#' @param y \code{[vector|data.frame]} Template data to be synthesized.
+#' @param x \code{[vector|data.frame]} Template data to be synthesized.
 #' @param ... arguments passed to other methods
 #'
 #' @return A \code{function} accepting a single integer argument: the number
@@ -26,19 +26,19 @@
 #'
 #' @family synthesis
 #' @export
-make_synthesizer <- function(y,...){
+make_synthesizer <- function(x,...){
   UseMethod("make_synthesizer")
 }
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.numeric <- function(y,...){
-  if (sum(!is.na(y))<2){
+make_synthesizer.numeric <- function(x,...){
+  if (sum(!is.na(x))<2){
     return(function(n) rep(NA_real_,n))
   }
 
-  ys <- sort(y,na.last=FALSE)
-  p  <- seq_along(y)/(length(y)+1)
+  ys <- sort(x,na.last=FALSE)
+  p  <- seq_along(x)/(length(x)+1)
   pmin <- min(p)
   pmax <- max(p)
   Qn <- stats::approxfun(x=p, y=ys)
@@ -49,29 +49,29 @@ make_synthesizer.numeric <- function(y,...){
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.integer <- function(y,...){
-  R <- make_synthesizer(as.double(y))
+make_synthesizer.integer <- function(x,...){
+  R <- make_synthesizer(as.double(x))
   function(n) as.integer( round(R(n)) )
 }
 
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.logical <- function(y,...){
-  function(n) sample(y, n, replace=TRUE)
+make_synthesizer.logical <- function(x,...){
+  function(n) sample(x, n, replace=TRUE)
 }
 
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.factor <- function(y,...){
-  function(n) sample(y, n, replace=TRUE)
+make_synthesizer.factor <- function(x,...){
+  function(n) sample(x, n, replace=TRUE)
 }
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.character <- function(y,...){
-  function(n) sample(y, n, replace=TRUE)
+make_synthesizer.character <- function(x,...){
+  function(n) sample(x, n, replace=TRUE)
 }
 
 randomize <- function(ranklist, cors){
@@ -100,20 +100,24 @@ randomize <- function(ranklist, cors){
 
 
 #' @rdname make_synthesizer
+#' @param utility \code{[numeric]} in (0,1]. The correlations between
+#'        the rank of the real dataset and the ranks of the synthetic dataset. Either
+#'        a single number or a vector of the form \code{c(variable1=x1,...)}. Only
+#'        used if \code{y} is a data frame. 
 #' @export
-make_synthesizer.data.frame <- function(y, correlations=1,...){
-  stopifnot(all(correlations > 0), all(correlations<=1))
-  L  <- lapply(y, make_synthesizer)
-  A  <- lapply(y, rank, na.last=FALSE)
-  # TODO: insert randomization of ranks here.
-  A <- randomize(A, correlations)
-  nr <- nrow(y)
+make_synthesizer.data.frame <- function(x, utility=1,...){
+  stopifnot(all(utility > 0), all(utility<=1))
+
+  L  <- lapply(x, make_synthesizer)
+  A  <- lapply(x, rank, na.last=FALSE)
+  A <- randomize(A, utility)
+  nr <- nrow(x)
   f <- function() as.data.frame(
           mapply(
             function(synth, rnk) sort(synth(nr), na.last = FALSE)[rnk]
           , L, A, SIMPLIFY = FALSE
           ) )
-  function(n=nrow(y)){
+  function(n=nrow(x)){
     out <- f()
     if (n == nr) return(out)
     if (n < nr)  return( out[sample(seq_len(nr), size=n, replace=FALSE),,drop=FALSE] )
@@ -130,11 +134,11 @@ make_synthesizer.data.frame <- function(y, correlations=1,...){
 #'
 #' Create \code{n} values or records based on the emperical (multivariate)
 #' distribution of \code{y}. For data frames, it is possible to decorrelate
-#' the variables by lowering the value for the \code{correlations} parameter.
+#' the variables by lowering the value for the \code{utility} parameter.
 #'
-#' @param y \code{[vector|data.frame]} data to synthesize.
+#' @param x \code{[vector|data.frame]} data to synthesize.
 #' @param n \code{[integer]} Number of values or records to synthesize.
-#' @param correlations \code{[numeric]} The correlations between the rank of
+#' @param utility \code{[numeric]} in (0,1] The correlations between the rank of
 #'        the real dataset and the ranks of the synthetic dataset. Either a single
 #'        number or a vector of the form \code{c(variable1=x1,...)}. Only used
 #'        if \code{y} is a data frame. 
@@ -149,7 +153,7 @@ make_synthesizer.data.frame <- function(y, correlations=1,...){
 #'
 #' @family synthesis
 #' @export
-synthesize <- function(y, n=NROW(y),correlations=1) make_synthesizer(y,correlations)(n) 
+synthesize <- function(x, n=NROW(x),utility=1) make_synthesizer(x,utility)(n) 
 
 
 

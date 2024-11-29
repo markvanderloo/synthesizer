@@ -91,21 +91,21 @@ pmse(synth=synth_iris, real=iris)
 ```
 
 
-## Lowering correlations
+## Choosing the utility-privacy trade-off
 
 Synthetic data can be too realistic, in the sense that it might reveal actual
 properties of the real entities represented by synthetic data. One way to
 mitigate this is to decorrelate the variables in the synthetic data. For data
-frames, this can be done with the `correlations` parameter. Either for all
-variables, or for a selectin of parameters. Setting correlatins to 1 (the
-default) yields the most realistic data, lowering the correlations causes loss
-of (linear or nonlinear) correlation between synthetic variables (if there was
-any in real data) 
-```{.R}
+frames, this can be done with the `utility` parameter. Either for all
+variables, or for a selectin of parameters. Setting `utility` to 1 (the
+default) yields the most realistic data, lowering the utility causes loss
+of (linear or nonlinear) correlation between synthetic variables, if there was
+any in the real data. 
+```{#decorrelate .R}
 # decorrelate rank matching to 0.5
-s1 <- synthesize(iris, correlations=0.5)
+s1 <- synthesize(iris, utility=0.5)
 # decorrelate only Species
-s2 <- synthesize(iris, correlations=c("Species"=0.5))
+s2 <- synthesize(iris, utility=c("Species"=0.5))
 ```
 
 ```{#plot2 .R fun=output_figure name="test" caption="Two versions of syntetic iris" device="png" width=800 height=400}
