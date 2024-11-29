@@ -91,6 +91,41 @@ pmse(synth=synth_iris, real=iris)
 ```
 
 
+## Lowering correlations
+
+Synthetic data can be too realistic, in the sense that it might reveal actual
+properties of the real entities represented by synthetic data. One way to
+mitigate this is to decorrelate the variables in the synthetic data. For data
+frames, this can be done with the `correlations` parameter. Either for all
+variables, or for a selectin of parameters. Setting correlatins to 1 (the
+default) yields the most realistic data, lowering the correlations causes loss
+of (linear or nonlinear) correlation between synthetic variables (if there was
+any in real data) 
+```{.R}
+# decorrelate rank matching to 0.5
+s1 <- synthesize(iris, correlations=0.5)
+# decorrelate only Species
+s2 <- synthesize(iris, correlations=c("Species"=0.5))
+```
+
+```{#plot2 .R fun=output_figure name="test" caption="Two versions of syntetic iris" device="png" width=800 height=400}
+
+par(mfrow=c(1,2))
+plot(Sepal.Length~Sepal.Width, data=s1, pch=16, col=s1$Species
+  , main="Synthetic Iris", sub="All variables decorrelated")
+plot(Sepal.Length~Sepal.Width, data=s2, pch=16, col=s2$Species
+  , main="Synthetic Iris", sub="Only species decorrelated")
+```
+In the left figure, we show the three variables of a synthesized `iris`
+dataset, where all variables are decorrelated. Both the geometric clustering
+and the species are now garbled. In the right figure we only decorrelate the
+Species variable. Here, the spatial clustering is retained while the
+correlation between color (Species) and location is lost.
+
+
+
+
+
 ## How it works
 
 
@@ -107,7 +142,9 @@ Given an original dataset with $n$ records:
    occurrence.
 2. For each categorical or logical variable, sample $n$ values with replacement.
 3. Reorder the synthetic dataset such that the rank order combinations of the synthetic
-   data match those of the original dataset. 
+   data match those of the original dataset. If any of the correlations is less than one,
+   first randomly permute the rank correlations until correlation between original real and
+   synthetic ranks drops below the specified value.
 
 If less than $m<n$ records are needed, sample $m$ records uniformly from the dataset just created.
 If $m>n$ records are needed, create $\lceil m/n\rceil$ synthetic datasets of size $m$ and sample

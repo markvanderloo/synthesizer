@@ -129,13 +129,15 @@ make_synthesizer.data.frame <- function(y, correlations=1,...){
 #' Create synthetic version of a dataset
 #'
 #' Create \code{n} values or records based on the emperical (multivariate)
-#' distribution of \code{y}.
+#' distribution of \code{y}. For data frames, it is possible to decorrelate
+#' the variables by lowering the value for the \code{correlations} parameter.
 #'
 #' @param y \code{[vector|data.frame]} data to synthesize.
 #' @param n \code{[integer]} Number of values or records to synthesize.
 #' @param correlations \code{[numeric]} The correlations between the rank of
 #'        the real dataset and the ranks of the synthetic dataset. Either a single
-#'        number or a vector of the form \code{c(variable1=x1,...)}.  
+#'        number or a vector of the form \code{c(variable1=x1,...)}. Only used
+#'        if \code{y} is a data frame. 
 #'
 #' @return A data object of the same type and structure as \code{y}.
 #'
