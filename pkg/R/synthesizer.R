@@ -8,6 +8,7 @@
 #'
 #'
 #' @param y \code{[vector|data.frame]} Template data to be synthesized.
+#' @param ... arguments passed to other methods
 #'
 #' @return A \code{function} accepting a single integer argument: the number
 #'         of synthesized values or records to return.
@@ -25,13 +26,13 @@
 #'
 #' @family synthesis
 #' @export
-make_synthesizer <- function(y){
+make_synthesizer <- function(y,...){
   UseMethod("make_synthesizer")
 }
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.numeric <- function(y){
+make_synthesizer.numeric <- function(y,...){
   if (sum(!is.na(y))<2){
     return(function(n) rep(NA_real_,n))
   }
@@ -48,7 +49,7 @@ make_synthesizer.numeric <- function(y){
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.integer <- function(y){
+make_synthesizer.integer <- function(y,...){
   R <- make_synthesizer(as.double(y))
   function(n) as.integer( round(R(n)) )
 }
@@ -56,29 +57,56 @@ make_synthesizer.integer <- function(y){
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.logical <- function(y){
+make_synthesizer.logical <- function(y,...){
   function(n) sample(y, n, replace=TRUE)
 }
 
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.factor <- function(y){
+make_synthesizer.factor <- function(y,...){
   function(n) sample(y, n, replace=TRUE)
 }
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.character <- function(y){
+make_synthesizer.character <- function(y,...){
   function(n) sample(y, n, replace=TRUE)
 }
+
+randomize <- function(ranklist, cors){
+  if ( all(cors==1) ) return(ranklist)
+  
+  if ( length(cors) == 1 && is.null(names(cors)) ){
+    cors <- rep(cors,length(ranklist))
+    names(cors) <- names(ranklist)
+  }
+
+  for ( variable in names(cors) ){
+    old_rank <- ranklist[[variable]]
+    new_rank <- old_rank
+    while (cor(old_rank,new_rank)>cors[variable]){
+      i <- sample(1:length(old_rank),size=4,replace=FALSE)
+      new_rank[rev(i)] <- new_rank[i] 
+    }
+    ranklist[[variable]] <- new_rank
+  }
+  
+  ranklist
+
+}
+
+
 
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.data.frame <- function(y){
+make_synthesizer.data.frame <- function(y, correlations=1,...){
+  stopifnot(all(correlations > 0), all(correlations<=1))
   L  <- lapply(y, make_synthesizer)
   A  <- lapply(y, rank, na.last=FALSE)
+  # TODO: insert randomization of ranks here.
+  A <- randomize(A, correlations)
   nr <- nrow(y)
   f <- function() as.data.frame(
           mapply(
@@ -105,6 +133,9 @@ make_synthesizer.data.frame <- function(y){
 #'
 #' @param y \code{[vector|data.frame]} data to synthesize.
 #' @param n \code{[integer]} Number of values or records to synthesize.
+#' @param correlations \code{[numeric]} The correlations between the rank of
+#'        the real dataset and the ranks of the synthetic dataset. Either a single
+#'        number or a vector of the form \code{c(variable1=x1,...)}.  
 #'
 #' @return A data object of the same type and structure as \code{y}.
 #'
@@ -116,7 +147,7 @@ make_synthesizer.data.frame <- function(y){
 #'
 #' @family synthesis
 #' @export
-synthesize <- function(y, n=NROW(y)) make_synthesizer(y)(n) 
+synthesize <- function(y, n=NROW(y),correlations=1) make_synthesizer(y,correlations)(n) 
 
 
 
