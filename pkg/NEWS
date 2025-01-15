@@ -2,6 +2,7 @@ version 0.4.0
 - added option to perturb ranks to 'synthesize'
 - renamed parameter y -> x in 'synthesize' and 'make_synthesizer'
 - removed experimental quality metrics (left pMSE)
+- added prototype time series synthesizer
 
 version 0.3.1
 - fix: bug in rank order matching

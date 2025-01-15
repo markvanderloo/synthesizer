@@ -73,6 +73,26 @@ make_synthesizer.character <- function(x,...){
   function(n) sample(x, n, replace=TRUE)
 }
 
+#' @rdname make_synthesizer
+#' @export
+make_synthesizer.ts <- function(x,...){
+  x_len   <- NROW(x)
+  x_start <- start(x)
+  x_end   <- end(x)
+  x_freq  <- frequency(x)
+  function(n=x_len){
+    if (!identical(n,x_len)){
+     err1 <- sprintf("Requested output lenght is %d, while input length is %d",x_len,n)
+     err2 <- "Synthetic 'ts' objects must be of the same length as the input."
+     stop(paste0(err1,err2,sep="\n"))
+    }
+    Y <-as.matrix(x,nrow=x_len,ncol=1)
+    Y <- make_synthesizer(as.data.frame(Y))(x_len)
+    ts(as.matrix(Y), start=x_start, end=x_end, frequency=x_freq)
+  }
+}
+
+
 # randomize the order of a rank vector until the correlation with the original
 # vecor has dropped below a maximum value.  Orders are randomized by selecting
 # each time at random approximately 1% of the vector and cyclicly permuting the
@@ -116,13 +136,13 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 
   L  <- lapply(x, make_synthesizer)
   A  <- lapply(x, rank, na.last=FALSE)
-  A <- randomize(A, utility)
+  A  <- randomize(A, utility)
   nr <- nrow(x)
-  f <- function() as.data.frame(
+  f  <- function() as.data.frame(
           mapply(
             function(synth, rnk) sort(synth(nr), na.last = FALSE)[rnk]
           , L, A, SIMPLIFY = FALSE
-          ) )
+         ) )
   function(n=nrow(x)){
     out <- f()
     if (n == nr) return(out)
