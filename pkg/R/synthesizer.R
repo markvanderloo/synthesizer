@@ -92,32 +92,39 @@ make_synthesizer.ts <- function(x,...){
   }
 }
 
+# Randomly swap adjacent elements of x. 
+# Each element has a probability of pswap to be part of a swap.
+randomize <- function(x, rho){
+  n          <- length(x)
+  block_size <- n*(1-rho)
+  k          <- round(block_size/2)
+ 
+  old_x <- x
+  while(cor(old_x,x) > rho){
+    i  <- sample(seq(k,n-k),size=1)
+    ii <- seq(i-k, i+k)
+    x[ii] <- x[sample(ii)]
+  }
+  x
+}
+
+
+
 
 # randomize the order of a rank vector until the correlation with the original
 # vecor has dropped below a maximum value.  Orders are randomized by selecting
 # each time at random approximately 1% of the vector and cyclicly permuting the
 # indices. 
-randomize <- function(ranklist, cors){
+decorrelate <- function(ranklist, cors){
   if ( all(cors==1) ) return(ranklist)
   
   if ( length(cors) == 1 && is.null(names(cors)) ){
     cors <- rep(cors,length(ranklist))
     names(cors) <- names(ranklist)
   }
-  
-  # find a reasonable size for the permutations
-  len <- length(ranklist[[1]])
-  size <- if (len <= 200) 2 else trunc(len/100) 
 
   for ( variable in names(cors) ){
-    old_rank <- ranklist[[variable]]
-    new_rank <- old_rank
-    while (cor(old_rank,new_rank)>cors[variable]){
-      i <- sample(1:length(old_rank), size=size, replace=FALSE)
-      # cyclic permutation of i: works for odd and even 'size'
-      new_rank[i[c(2:size,1)]] <- new_rank[i] 
-    }
-    ranklist[[variable]] <- new_rank
+    ranklist[[variable]] <- randomize(ranklist[[variable]], cors[variable])
   }
 
   ranklist
@@ -136,7 +143,7 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 
   L  <- lapply(x, make_synthesizer)
   A  <- lapply(x, rank, na.last=FALSE)
-  A  <- randomize(A, utility)
+  A  <- decorrelate(A, utility)
   nr <- nrow(x)
   f  <- function() as.data.frame(
           mapply(
