@@ -19,10 +19,15 @@ Use `citation('synthesizer')` to cite the package.
 also provides a few basic functions based on pMSE to measure some utility of
 the synthesized data.
 
-The package supports numerical, categorical/ordinal, and mixed data and also
-correctly takes account of missing values and mixed distributions. A `utility`
-parameter lets you gradually shift between realistic data with high utility 
-and less realistic data with decreased utility.
+The package supports numerical, categorical/ordinal, and mixed data, it
+synthesizes times series (`ts`) objects and also correctly takes account of
+missing values and mixed (or zero-inflated) distributions.  A `utility`
+parameter lets you gradually shift between realistic data with high utility and
+less realistic data with decreased correlations between original and syntesized
+data.
+
+
+
 
 At the moment the method used seems promising but we are working on
 investigating where the method shines and where it fails. So we have no
@@ -48,7 +53,7 @@ packageVersion("synthesizer")
 
 We will use the `iris` dataset, that is built into R.
 
-```{#load_chickweight .R}
+```{#load_iris .R}
 data(iris)
 head(iris)
 ```
@@ -84,7 +89,7 @@ dim(more_synth)
 The pMSE method is a popular way of measuring the quality of a dataset. The
 idea is to train a model to predict whether a record is synthetic or not. The
 worse a model can do that, the better a synthic data instance resembles the
-real data. The value scales between 0 and 0.25 (if the synthetic and real
+original data. The value scales between 0 and 0.25 (if the synthetic and original
 datasets have the same number of records).  Smaller is better.
 
 ```{#pMSE .R}
@@ -100,13 +105,20 @@ pmse(synth=synth_iris, real=iris, model="rf")
 ## Choosing the utility-privacy trade-off
 
 Synthetic data can be too realistic, in the sense that it might reveal actual
-properties of the real entities represented by synthetic data. One way to
-mitigate this is to decorrelate the variables in the synthetic data. For data
-frames, this can be done with the `utility` parameter. Either for all
-variables, or for a selectin of parameters. Setting `utility` to 1 (the
-default) yields the most realistic data, lowering the utility causes loss of
-(linear or nonlinear) correlation between synthetic variables, if there was any
-in the real data. 
+properties of the original entities used to create the synthetic data. One way
+to mitigate this is to decrease the rank correlation between the original and
+the synthetic data.
+
+When synthesizing data frames this can be controlled with the `utility`
+parameter. This parameter varies from 0, representing the lowest utility, to 1,
+the default and maximum utility.  The `utility` refers to the maximum rank
+correlation between original and synthesized variables. If `utility` is a
+single (unnamed) value, all synthetic variables are rank-decorrelated from the
+original data by random permutations until the rank correlation between
+synthetic and original data drops below the `utility` value. It is also
+possible to lower the utility of chosen variables. Variables for which
+`utility` is not specified will default to perfect rank correlation
+(`utility=1`).
 ```{#decorrelate .R}
 # decorrelate rank matching to 0.5
 s1 <- synthesize(iris, utility=0.5)
@@ -114,13 +126,12 @@ s1 <- synthesize(iris, utility=0.5)
 s2 <- synthesize(iris, utility=c("Species"=0.5))
 ```
 
-```{#plot2 .R fun=output_figure name="test" caption="Two versions of syntetic iris" device="png" width=800 height=400}
-
+```{#plot2 .R fun=output_figure name="utility" caption="Two versions of syntetic iris" device="png" width=800 height=400}
 par(mfrow=c(1,2))
 plot(Sepal.Length~Sepal.Width, data=s1, pch=16, col=s1$Species
-  , main="Synthetic Iris", sub="All variables decorrelated")
+  , main="Synthetic Iris - all variables decorrelated", sub="All variables decorrelated")
 plot(Sepal.Length~Sepal.Width, data=s2, pch=16, col=s2$Species
-  , main="Synthetic Iris", sub="Only species decorrelated")
+  , main="Synthetic Iris - Species decorrelated", sub="Only species decorrelated")
 ```
 In the left figure, we show the three variables of a synthesized `iris`
 dataset, where all variables are decorrelated. Both the geometric clustering
@@ -129,28 +140,60 @@ Species variable. Here, the spatial clustering is retained while the
 correlation between color (Species) and location is lost.
 
 
+## Synthesizing (multivariate) time series
+
+Synthesizing time series is as easy as synthesizing data frames, but there are a few differences.
+
+- Synthesized time series must have the same number of data points as the
+  original data. Forecasts or backcasts from the original data are not possible.
+- There is nu `utility` parameter for time series data.
+
+As a demonstration, we create a synthetic version of the `UKDriverDeaths`
+dataset, including with base R.
+```{#UKDD .R}
+data(UKDriverDeaths)
+synth_udd <- synthesize(UKDriverDeaths)
+```
+Below is a plot of the original and synthetic dataset.
+```{#plot2 .R fun=output_figure name="ukdd" caption="Original and synthetic time series" device="png" width=800 height=400}
+plot(UKDriverDeaths,las=1,lwd=2,main="Drivers killed or seriously injured in the UK"
+    , sub="Data from R package 'datasets'")
+scol <- adjustcolor('blue',alpha.f=0.5)
+lines(synth_udd, col=scol,lwd=2)
+legend("topleft",col=c("black",scol),lwd=2,legend=c("Original","Synthetic"),bty='n')
+```
+Here, the rank order matching procedure is used to ensure that values sampled
+from the value distribution of the original time series are put in time-line
+order.
+
+
 
 ## How it works
 
+Synthetic data is generated in two steps:
 
-Synthetic data is prepared as follows.
+1. For numerical variables, use inverse transform sampling based on a linear interpolation of the 
+   emperical quantile function; for all other variable types, sample with replacement. This yields
+   a set of synthetic variables with univariate distributions close to their originals.
+2. Reconstruct (linear or nonlinear) correlations by ensuring that the rank order of each synthetic 
+   variable matches that of the original data.
 
-Given an original dataset with $n$ records:
+These steps ensure a synthetic dataset that closely resembles the original
+data. The rank order matching ensures a certain resiliance to the influence of
+outliers. If the `utility` argument has a value less than the default 1, a third
+step is performed:
 
-1. For each numeric variable in the dataset, determine the empirical inverse
-   cumulative density function (ECDF), and use linear interpolation to interpolate
-   between the data points. The observed minimum and maximum are also the minimum
-   and maximum of the synthetic univariate distribution. Sample $n$ values using
-   inverse transform sampling with the linear interpolated inverse ECDF. 
-   Missing values are taken into account by sampling them proportional to their
-   occurrence.
-2. For each categorical or logical variable, sample $n$ values with replacement.
-3. Reorder the synthetic dataset such that the rank order combinations of the synthetic
-   data match those of the original dataset. If any of the correlations is less than one,
-   first randomly permute the rank correlations until correlation between original real and
-   synthetic ranks drops below the specified value.
+3. Randomly choose a block of consecutive values in the synthetic data and permute it
+   randomly. Iterate these two steps until the rank correlation between the original
+   and synthetic data drops below the specified `utility` value.
 
-If less than $m<n$ records are needed, sample $m$ records uniformly from the dataset just created.
-If $m>n$ records are needed, create $\lceil m/n\rceil$ synthetic datasets of size $m$ and sample
-uniformly $m$ records from the combined data sets.
+Except for the case of time series it is possible to sample datasets that are
+larger or smaller than their originals. This is done by (if necessary) creating
+multiple synthetic datasets and sample records uniformly without replacement
+from the combined dataset.
+
+
+
+
+
 

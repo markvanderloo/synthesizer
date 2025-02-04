@@ -95,6 +95,11 @@ make_synthesizer.ts <- function(x,...){
 # Randomly swap adjacent elements of x. 
 # Each element has a probability of pswap to be part of a swap.
 randomize <- function(x, rho){
+  # if desired correlation equals zero (or close enough) we don't use
+  # any rank-matching at al and leave the initially sampled variable
+  # intact.
+  if (rho < 0.05) return(sample(x))
+
   n          <- length(x)
   block_size <- n*(1-rho)
   k          <- round(block_size/2)
@@ -116,8 +121,12 @@ randomize <- function(x, rho){
 # each time at random approximately 1% of the vector and cyclicly permuting the
 # indices. 
 decorrelate <- function(ranklist, cors){
-  if ( all(cors==1) ) return(ranklist)
-  
+  # case of perfect utility matching: no randomization necessary
+  if ( (length(cors)==1 && cors==1) || 
+       (length(cors)==length(ranklist) && all(cors==1)) ){
+    return(ranklist)
+  }
+
   if ( length(cors) == 1 && is.null(names(cors)) ){
     cors <- rep(cors,length(ranklist))
     names(cors) <- names(ranklist)
@@ -139,7 +148,7 @@ decorrelate <- function(ranklist, cors){
 #'
 #' @export
 make_synthesizer.data.frame <- function(x, utility=1,...){
-  stopifnot(all(utility > 0), all(utility<=1))
+  stopifnot(all(utility >= 0), all(utility<=1))
 
   L  <- lapply(x, make_synthesizer)
   A  <- lapply(x, rank, na.last=FALSE)
@@ -166,15 +175,25 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 #' Create synthetic version of a dataset
 #'
 #' Create \code{n} values or records based on the emperical (multivariate)
-#' distribution of \code{y}. For data frames it is possible to decorrelate the
-#' output variables by lowering the value for the \code{utility} parameter.
+#' distribution of \code{y}. For data frames it is possible to decorrelate synthetic
+#' from the original variables by lowering the value for the \code{utility} parameter.
 #'
 #' @param x \code{[vector|data.frame]} data to synthesize.
 #' @param n \code{[integer]} Number of values or records to synthesize.
-#' @param utility \code{[numeric]} in \eqn{(0,1]} The correlations between the ranks of
-#'        the real data and synthetic data. Either a single
-#'        number or a vector of the form \code{c("variable1"=x1,...)}. Only used
-#'        if \code{x} is a data frame. 
+#' @param utility \code{[numeric]} in \eqn{[0,1]}. Either a single utility
+#'        value that is applied to all variables, or a vector of the form
+#'        \code{c(variable1=ut1lity1,...)}. Variables not explicitly mentioned
+#'        will have \code{utility=1}. See also the note below.
+#'
+#'
+#' @note
+#' The utility of a synthetic variable is lowered by decorelating the rank order
+#' between the real and synthetic data. If \code{utility=1}, the synthetic data
+#' will ordered such that it has the same rank order as the original data. If
+#' \code{utility=0}, no such reordering will take place. For values between
+#' 0 and 1, blocks of data are randomly selected and randomly permuted
+#' iteratively until the rank order correlation between original and synthetic
+#' data drops below the parameter.
 #'
 #' @return A data object of the same type and structure as \code{x}.
 #'
@@ -197,7 +216,7 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 #'
 #' @family synthesis
 #' @export
-synthesize <- function(x, n=NROW(x),utility=1) make_synthesizer(x,utility)(n) 
+synthesize <- function(x, n=NROW(x), utility=1) make_synthesizer(x,utility)(n) 
 
 
 
