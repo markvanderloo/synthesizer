@@ -101,7 +101,9 @@ randomize <- function(x, rho){
   if (rho < 0.05) return(sample(x))
 
   n          <- length(x)
-  block_size <- n*(1-rho)
+  # theory suggests using a block size of n*(1-rho); We choose a smaller block size
+  # to spread permutations accross the vector (at the cost of some extra iterations)
+  block_size <- max(n*(1-rho)/2,4)
   k          <- round(block_size/2)
  
   old_x <- x
