@@ -21,12 +21,10 @@ the synthesized data.
 
 The package supports numerical, categorical/ordinal, and mixed data, it
 synthesizes times series (`ts`) objects and also correctly takes account of
-missing values and mixed (or zero-inflated) distributions.  A `utility`
+missing values and mixed (or zero-inflated) distributions.  A `rankcor`
 parameter lets you gradually shift between realistic data with high utility and
 less realistic data with decreased correlations between original and syntesized
 data.
-
-
 
 
 At the moment the method used seems promising but we are working on
@@ -109,21 +107,21 @@ properties of the original entities used to create the synthetic data. One way
 to mitigate this is to decrease the rank correlation between the original and
 the synthetic data.
 
-When synthesizing data frames this can be controlled with the `utility`
+When synthesizing data frames this can be controlled with the `rankcor`
 parameter. This parameter varies from 0, representing the lowest utility, to 1,
-the default and maximum utility.  The `utility` refers to the maximum rank
-correlation between original and synthesized variables. If `utility` is a
+the default and maximum utility.  The `rankcor` refers to the maximum rank
+correlation between original and synthesized variables. If `rankcor` is a
 single (unnamed) value, all synthetic variables are rank-decorrelated from the
 original data by random permutations until the rank correlation between
-synthetic and original data drops below the `utility` value. It is also
-possible to lower the utility of chosen variables. Variables for which
-`utility` is not specified will default to perfect rank correlation
-(`utility=1`).
+synthetic and original data drops below the `rankcor` value. It is also
+possible to lower the utility of a selection of variables. Variables for which
+`rankcor` is not specified will default to perfect rank correlation
+(`rankcor=1`).
 ```{#decorrelate .R}
 # decorrelate rank matching to 0.5
-s1 <- synthesize(iris, utility=0.5)
+s1 <- synthesize(iris, rankcor=0.5)
 # decorrelate only Species
-s2 <- synthesize(iris, utility=c("Species"=0.5))
+s2 <- synthesize(iris, rankcor=c("Species"=0.5))
 ```
 
 ```{#plot2 .R fun=output_figure name="utility" caption="Two versions of syntetic iris" device="png" width=800 height=400}
@@ -146,7 +144,7 @@ Synthesizing time series is as easy as synthesizing data frames, but there are a
 
 - Synthesized time series must have the same number of data points as the
   original data. Forecasts or backcasts from the original data are not possible.
-- There is nu `utility` parameter for time series data.
+- There is nu `rankcor` parameter for time series data.
 
 As a demonstration, we create a synthetic version of the `UKDriverDeaths`
 dataset, including with base R.
@@ -180,12 +178,12 @@ Synthetic data is generated in two steps:
 
 These steps ensure a synthetic dataset that closely resembles the original
 data. The rank order matching ensures a certain resiliance to the influence of
-outliers. If the `utility` argument has a value less than the default 1, a third
+outliers. If the `rankcor` argument has a value less than the default 1, a third
 step is performed:
 
 3. Randomly choose a block of consecutive values in the synthetic data and permute it
    randomly. Iterate these two steps until the rank correlation between the original
-   and synthetic data drops below the specified `utility` value.
+   and synthetic data drops below the specified `rankcor` value.
 
 Except for the case of time series it is possible to sample datasets that are
 larger or smaller than their originals. This is done by (if necessary) creating

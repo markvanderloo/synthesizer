@@ -141,18 +141,18 @@ decorrelate <- function(ranklist, cors){
 
 
 #' @rdname make_synthesizer
-#' @param utility \code{[numeric]} in \eqn{(0,1]} The correlations between the ranks of
+#' @param rankcor \code{[numeric]} in \eqn{(0,1]} The correlations between the ranks of
 #'        the real data and synthetic data. Either a single
 #'        number or a vector of the form \code{c("variable1"=x1,...)}. Only used
 #'        if \code{x} is a data frame. 
 #'
 #' @export
-make_synthesizer.data.frame <- function(x, utility=1,...){
-  stopifnot(all(utility >= 0), all(utility<=1))
+make_synthesizer.data.frame <- function(x, rankcor=1,...){
+  stopifnot(all(rankcor >= 0), all(rankcor<=1))
 
   L  <- lapply(x, make_synthesizer)
   A  <- lapply(x, rank, na.last=FALSE)
-  A  <- decorrelate(A, utility)
+  A  <- decorrelate(A, rankcor)
   nr <- nrow(x)
   f  <- function() as.data.frame(
           mapply(
@@ -176,24 +176,24 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 #'
 #' Create \code{n} values or records based on the emperical (multivariate)
 #' distribution of \code{y}. For data frames it is possible to decorrelate synthetic
-#' from the original variables by lowering the value for the \code{utility} parameter.
+#' from the original variables by lowering the value for the \code{rankcor} parameter.
 #'
 #' @param x \code{[vector|data.frame]} data to synthesize.
 #' @param n \code{[integer]} Number of values or records to synthesize.
-#' @param utility \code{[numeric]} in \eqn{[0,1]}. Either a single utility
+#' @param rankcor \code{[numeric]} in \eqn{[0,1]}. Either a single rank correlation
 #'        value that is applied to all variables, or a vector of the form
 #'        \code{c(variable1=ut1lity1,...)}. Variables not explicitly mentioned
-#'        will have \code{utility=1}. See also the note below.
+#'        will have \code{rankcor=1}. See also the note below.
 #'
 #'
 #' @note
-#' The utility of a synthetic variable is lowered by decorelating the rank order
-#' between the real and synthetic data. If \code{utility=1}, the synthetic data
-#' will ordered such that it has the same rank order as the original data. If
-#' \code{utility=0}, no such reordering will take place. For values between
-#' 0 and 1, blocks of data are randomly selected and randomly permuted
-#' iteratively until the rank order correlation between original and synthetic
-#' data drops below the parameter.
+#' The utility of a synthetic variable is lowered by decorelating the rank
+#' correlation between the real and synthetic data. If \code{rankcor=1}, the
+#' synthetic data will ordered such that it has the same rank order as the
+#' original data. If \code{rankcor=0}, no such reordering will take place. For
+#' values between 0 and 1, blocks of data are randomly selected and randomly
+#' permuted iteratively until the rank correlation between original and
+#' synthetic data drops below the parameter.
 #'
 #' @return A data object of the same type and structure as \code{x}.
 #'
@@ -203,9 +203,9 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 #' synthesize(cars)
 #' synthesize(cars,25)
 #'
-#' s1 <- synthesize(iris, utility=1)
-#' s2 <- synthesize(iris, utility=0.5)
-#' s3 <- synthesize(iris, utility=c("Species"=0.5))
+#' s1 <- synthesize(iris, rankcor=1)
+#' s2 <- synthesize(iris, rankcor=0.5)
+#' s3 <- synthesize(iris, rankcor=c("Species"=0.5))
 #' 
 #' oldpar <- par(mfrow=c(2,2), pch=16, las=1)
 #' plot(Sepal.Length ~ Sepal.Width, data=iris, col=iris$Species, main="Iris")
@@ -216,7 +216,7 @@ make_synthesizer.data.frame <- function(x, utility=1,...){
 #'
 #' @family synthesis
 #' @export
-synthesize <- function(x, n=NROW(x), utility=1) make_synthesizer(x,utility)(n) 
+synthesize <- function(x, n=NROW(x), rankcor=1) make_synthesizer(x,rankcor)(n) 
 
 
 
