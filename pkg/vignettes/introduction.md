@@ -6,7 +6,7 @@
 ---
 title: Introduction to `synthesizer`
 author: Mark P.J. van der Loo
-css: "style.css"
+css: style.css
 ---
 
 Package version `packageVersion("synthesizer")`{.R}. 
@@ -25,12 +25,6 @@ missing values and mixed (or zero-inflated) distributions.  A `rankcor`
 parameter lets you gradually shift between realistic data with high utility and
 less realistic data with decreased correlations between original and syntesized
 data.
-
-
-At the moment the method used seems promising but we are working on
-investigating where the method shines and where it fails. So we have no
-guarantees yet on utility, privacy, and so on. Having said that, our
-preliminary results are promising, and using the package is very easy.
 
 
 ## Installation
@@ -86,7 +80,7 @@ dim(more_synth)
 
 The pMSE method is a popular way of measuring the quality of a dataset. The
 idea is to train a model to predict whether a record is synthetic or not. The
-worse a model can do that, the better a synthic data instance resembles the
+worse a model can do that, the better a synthetic data instance resembles the
 original data. The value scales between 0 and 0.25 (if the synthetic and original
 datasets have the same number of records).  Smaller is better.
 
@@ -160,9 +154,6 @@ scol <- adjustcolor('blue',alpha.f=0.5)
 lines(synth_udd, col=scol,lwd=2)
 legend("topleft",col=c("black",scol),lwd=2,legend=c("Original","Synthetic"),bty='n')
 ```
-Here, the rank order matching procedure is used to ensure that values sampled
-from the value distribution of the original time series are put in time-line
-order.
 
 
 
