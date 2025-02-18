@@ -10,7 +10,9 @@
 #' @param ... arguments passed to other methods
 #'
 #' @return A \code{function} accepting a single integer argument: the number
-#'         of synthesized values or records to return.
+#'         of synthesized values or records to return.  For objects of class
+#'         \code{ts} \code{n} must be equal to the length of the original data
+#'         (this is set as the default).
 #'
 #'
 #' @examples
@@ -135,16 +137,18 @@ make_decorrelating_synthesizer <- function(x){
 }
 
 #' @rdname make_synthesizer
-#' @param rankcor \code{[numeric]} in \eqn{(0,1]} The correlations between the ranks of
-#'        the real data and synthetic data. Either a single
-#'        number or a vector of the form \code{c("variable1"=x1,...)}. Only used
-#'        if \code{x} is a data frame. 
+#' @param cluster \code{[cluster]} object created by the \code{parallel} package, for
+#'        example by \code{\link[parallel]{makeCluster}} function. Columns of \code{x}
+#'        are synthesized in parallel over the cluster instances.
 #'
 #' @export
-make_synthesizer.data.frame <- function(x, Ncpus=1,...){
-  stopifnot(is.numeric(Ncpus), Ncpus >= 1)
-
-  L <- lapply(x, make_decorrelating_synthesizer)
+make_synthesizer.data.frame <- function(x, cluster=NULL,...){
+  
+  L <- if(is.null(cluster)){ 
+    lapply(x, make_decorrelating_synthesizer)
+  } else {
+    parallel::parLapply(cluster, x, make_decorrelating_synthesizer)
+  }
   m <- NROW(x)
   varnames <- names(x)
   function(n, rankcor=1,...){
@@ -156,7 +160,11 @@ make_synthesizer.data.frame <- function(x, Ncpus=1,...){
     } else {
       sample(ceiling(n/m)*m, size=n, replace=FALSE)
     }
-    lst <- mapply(function(f,rho) f(n,rho,ii), L, rcors,SIMPLIFY=FALSE)
+    lst <- if (is.null(cluster)) {
+      mapply(function(f, rho) f(n, rho,ii), L, rcors, SIMPLIFY=FALSE)
+    } else { 
+      parallel::clusterMap(cluster, function(f,rho) f(n,rho,ii), L, rcors, SIMPLIFY=FALSE)
+    }
     do.call("data.frame",lst)
   }
 
@@ -176,7 +184,7 @@ get_rcors <- function(varnames, rankcor){
       wrong_names <- names(rankcor)[!names(rankcor) %in% varnames]
       msg <- sprintf("Mismatch in specification of 'rankcor'. Variables not occurring in the data:\n%s"
                     , paste(wrong_names, collapse=", "))
-      error(msg)
+      stop(msg)
     }
     out[ names(rankcor) ] <- rankcor
   }
@@ -199,7 +207,9 @@ get_rcors <- function(varnames, rankcor){
 #'        value that is applied to all variables, or a vector of the form
 #'        \code{c(variable1=ut1lity1,...)}. Variables not explicitly mentioned
 #'        will have \code{rankcor=1}. See also the note below. Ignored for 
-#'        all types of \code{x}, except when it is a \code{data.frame}.
+#'        all types of \code{x}, except for objects of class \code{data.frame}.
+#' @param Ncpus \code{[integer]} Number of CPUs to use. Ignored for all
+#'        types of \code{x}, except for objects of class \code{data.frame}. 
 #'
 #'
 #' @note
@@ -230,9 +240,20 @@ get_rcors <- function(varnames, rankcor){
 #' plot(Sepal.Length ~ Sepal.Width, data=s3, col=s3$Species, main="Low utility Species")
 #' par(oldpar)
 #'
+#' s4 <- synthesize(iris, Ncpus=2)
+#'
 #' @family synthesis
 #' @export
-synthesize <- function(x, n=NROW(x), rankcor=1) make_synthesizer(x)(n, rankcor) 
+synthesize <- function(x, n=NROW(x), rankcor=1, Ncpus=1){ 
+  stopifnot(is.numeric(Ncpus), Ncpus >= 1)
+  if (!is.data.frame(x) || Ncpus==1) return (make_synthesizer(x)(n, rankcor))
+
+  cluster <- parallel::makeCluster(Ncpus)
+  parallel::clusterSetRNGStream(cluster)
+  on.exit(parallel::stopCluster(cluster))
+  make_synthesizer(x, cluster=cluster)(n,rankcor)
+
+} 
 
 
 
