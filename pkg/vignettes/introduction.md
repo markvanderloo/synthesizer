@@ -162,15 +162,6 @@ multiple synthetic datasets and sample records uniformly without replacement
 from the combined dataset.
 
 
-## Notes
-
-The methodology of the package in principle lends itself for paralellization:
-variables can be synthesized and reordered easily in parallel. Implementations
-based on `PSOCK` clusters using the `parallel` package have demonstrated that
-the serialization and transfer of data weigh significantly on the computation
-time. Even for large numbers of variables and large numbers of records, the
-single-threaded version of the algorithm is faster than the paralellized
-version.
 
 
 
