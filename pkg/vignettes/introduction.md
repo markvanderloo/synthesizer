@@ -9,9 +9,7 @@ author: Mark P.J. van der Loo
 css: style.css
 ---
 
-Package version `packageVersion("synthesizer")`{.R}. 
-
-Use `citation('synthesizer')` to cite the package.
+Package version `packageVersion("synthesizer")`{.R}. Please use `citation('synthesizer')` to cite the package.
 
 ## Introduction
 
@@ -76,25 +74,7 @@ more_synth <- synthesize(iris, n=250)
 dim(more_synth)
 ```
 
-## Checking quality
-
-The pMSE method is a popular way of measuring the quality of a dataset. The
-idea is to train a model to predict whether a record is synthetic or not. The
-worse a model can do that, the better a synthetic data instance resembles the
-original data. The value scales between 0 and 0.25 (if the synthetic and original
-datasets have the same number of records).  Smaller is better.
-
-```{#pMSE .R}
-pmse(synth=synth_iris, real=iris)
-```
-The package lets you choose between logistic regression (the default) and a
-random forest classifier as the predictive model.
-
-```{#pMSE .R}
-pmse(synth=synth_iris, real=iris, model="rf")
-```
-
-## Choosing the utility-privacy trade-off
+## Controlling the utility-privacy trade-off
 
 Synthetic data can be too realistic, in the sense that it might reveal actual
 properties of the original entities used to create the synthetic data. One way
@@ -180,6 +160,17 @@ Except for the case of time series it is possible to sample datasets that are
 larger or smaller than their originals. This is done by (if necessary) creating
 multiple synthetic datasets and sample records uniformly without replacement
 from the combined dataset.
+
+
+## Notes
+
+The methodology of the package in principle lends itself for paralellization:
+variables can be synthesized and reordered easily in parallel. Implementations
+based on `PSOCK` clusters using the `parallel` package have demonstrated that
+the serialization and transfer of data weigh significantly on the computation
+time. Even for large numbers of variables and large numbers of records, the
+single-threaded version of the algorithm is faster than the paralellized
+version.
 
 
 

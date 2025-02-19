@@ -1,7 +1,7 @@
 Package: synthesizer
 Type: Package
 Title: Fast, Robust, and High-Quality Synthetic Data Generation with a Tuneable Privacy-Utility Trade-Off
-Version: 0.4.0.5
+Version: 0.4.0.6
 Authors@R: c( person("Mark", "van der Loo", role=c("aut","cre")
              , email="mark.vanderloo@gmail.com"
              , comment= c(ORCID="0000-0002-9807-4686")))
