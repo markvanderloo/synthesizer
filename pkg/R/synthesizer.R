@@ -228,7 +228,6 @@ make_synthesizer.data.frame <- function(x,...){
 #' plot(Sepal.Length ~ Sepal.Width, data=s3, col=s3$Species, main="Low utility Species")
 #' par(oldpar)
 #'
-#' s4 <- synthesize(iris, Ncpus=2)
 #'
 #' @family synthesis
 #' @export
