@@ -118,10 +118,10 @@ Synthesizing time series is as easy as synthesizing data frames, but there are a
 
 - Synthesized time series must have the same number of data points as the
   original data. Forecasts or backcasts from the original data are not possible.
-- There is nu `rankcor` parameter for time series data.
+- There is no `rankcor` parameter for time series data.
 
 As a demonstration, we create a synthetic version of the `UKDriverDeaths`
-dataset, including with base R.
+dataset that is included with base R.
 ```{#UKDD .R}
 data(UKDriverDeaths)
 synth_udd <- synthesize(UKDriverDeaths)
