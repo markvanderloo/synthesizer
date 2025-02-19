@@ -136,6 +136,29 @@ make_decorrelating_synthesizer <- function(x){
 
 }
 
+# some logic to expand versions of the rankcor variable.
+# Output: a named vector, where 'varnames' are the names of the variables in the data
+get_rcors <- function(varnames, rankcor){
+  p          <- length(varnames)
+  out        <- rep(1,p)
+  names(out) <- varnames
+
+  if ( length(rankcor)==1 & is.null(names(rankcor)) ){ 
+    out[1:p] <- rankcor
+  } else {
+    if (!all(names(rankcor) %in% varnames)){
+      wrong_names <- names(rankcor)[!names(rankcor) %in% varnames]
+      msg <- sprintf("Mismatch in specification of 'rankcor'. Variables not occurring in the data:\n%s"
+                    , paste(wrong_names, collapse=", "))
+      stop(msg)
+    }
+    out[ names(rankcor) ] <- rankcor
+  }
+  
+  out
+}
+
+
 #' @rdname make_synthesizer
 #' @param cluster \code{[cluster]} object created by the \code{parallel} package, for
 #'        example by \code{\link[parallel]{makeCluster}} function. Columns of \code{x}
@@ -168,28 +191,6 @@ make_synthesizer.data.frame <- function(x, cluster=NULL,...){
     do.call("data.frame",lst)
   }
 
-}
-
-# some logic to expand versions of the rankcor variable.
-# Output: a named vector, where 'varnames' are the names
-get_rcors <- function(varnames, rankcor){
-  p          <- length(varnames)
-  out        <- rep(1,p)
-  names(out) <- varnames
-
-  if ( length(rankcor)==1 & is.null(names(rankcor)) ){ 
-    out[1:p] <- rankcor
-  } else {
-    if (!all(names(rankcor) %in% varnames)){
-      wrong_names <- names(rankcor)[!names(rankcor) %in% varnames]
-      msg <- sprintf("Mismatch in specification of 'rankcor'. Variables not occurring in the data:\n%s"
-                    , paste(wrong_names, collapse=", "))
-      stop(msg)
-    }
-    out[ names(rankcor) ] <- rankcor
-  }
-  
-  out
 }
 
 
