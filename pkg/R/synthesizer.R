@@ -160,18 +160,11 @@ get_rcors <- function(varnames, rankcor){
 
 
 #' @rdname make_synthesizer
-#' @param cluster \code{[cluster]} object created by the \code{parallel} package, for
-#'        example by \code{\link[parallel]{makeCluster}} function. Columns of \code{x}
-#'        are synthesized in parallel over the cluster instances.
 #'
 #' @export
-make_synthesizer.data.frame <- function(x, cluster=NULL,...){
+make_synthesizer.data.frame <- function(x,...){
   
-  L <- if(is.null(cluster)){ 
-    lapply(x, make_decorrelating_synthesizer)
-  } else {
-    parallel::parLapply(cluster, x, make_decorrelating_synthesizer)
-  }
+  L <- lapply(x, make_decorrelating_synthesizer)
   m <- NROW(x)
   varnames <- names(x)
   function(n, rankcor=1,...){
@@ -183,11 +176,7 @@ make_synthesizer.data.frame <- function(x, cluster=NULL,...){
     } else {
       sample(ceiling(n/m)*m, size=n, replace=FALSE)
     }
-    lst <- if (is.null(cluster)) {
-      mapply(function(f, rho) f(n, rho,ii), L, rcors, SIMPLIFY=FALSE)
-    } else { 
-      parallel::clusterMap(cluster, function(f,rho) f(n,rho,ii), L, rcors, SIMPLIFY=FALSE)
-    }
+    lst <- mapply(function(f, rho) f(n, rho,ii), L, rcors, SIMPLIFY=FALSE)
     do.call("data.frame",lst)
   }
 
@@ -209,8 +198,6 @@ make_synthesizer.data.frame <- function(x, cluster=NULL,...){
 #'        \code{c(variable1=ut1lity1,...)}. Variables not explicitly mentioned
 #'        will have \code{rankcor=1}. See also the note below. Ignored for 
 #'        all types of \code{x}, except for objects of class \code{data.frame}.
-#' @param Ncpus \code{[integer]} Number of CPUs to use. Ignored for all
-#'        types of \code{x}, except for objects of class \code{data.frame}. 
 #'
 #'
 #' @note
@@ -245,16 +232,8 @@ make_synthesizer.data.frame <- function(x, cluster=NULL,...){
 #'
 #' @family synthesis
 #' @export
-synthesize <- function(x, n=NROW(x), rankcor=1, Ncpus=1){ 
-  stopifnot(is.numeric(Ncpus), Ncpus >= 1)
-  if (!is.data.frame(x) || Ncpus==1) return (make_synthesizer(x)(n, rankcor))
+synthesize <- function(x, n=NROW(x), rankcor=1) make_synthesizer(x)(n,rankcor)
 
-  cluster <- parallel::makeCluster(Ncpus)
-  parallel::clusterSetRNGStream(cluster)
-  on.exit(parallel::stopCluster(cluster))
-  make_synthesizer(x, cluster=cluster)(n,rankcor)
-
-} 
 
 
 

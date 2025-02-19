@@ -1,21 +1,21 @@
 Package: synthesizer
 Type: Package
-Title: Synthesize Data Based on Empirical Quantile Functions and Rank Order Matching
+Title: Fast, Robust, and High-Quality Synthetic Data Generation with a Tuneable Privacy-Utility Trade-Off
 Version: 0.4.0.5
 Authors@R: c( person("Mark", "van der Loo", role=c("aut","cre")
              , email="mark.vanderloo@gmail.com"
              , comment= c(ORCID="0000-0002-9807-4686")))
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
-Description: Synthesize numeric, categorical or mixed data. Data circumstances
-    including mixed (or zero-inflated) distributions and missing data patterns are
-    reproduced in the synthetic data. A single parameter, allows balancing between
-    high-quality synthetic data that represents correlations of the original data
-    and lower-quality but more privacy-safe synthetic data without correlations.
-    Tuning can be done per variable or for the whole dataset. Computing can be sped
-    up using paralellized data synthesis. 
+Description: Synthesize numeric, categorical, mixed and time series data. Data 
+    circumstances including mixed (or zero-inflated) distributions and missing
+    data patterns are reproduced in the synthetic data. A single parameter allows
+    balancing between high-quality synthetic data that represents correlations of
+    the original data and lower quality but more privacy safe synthetic data
+    without correlations. Tuning can be done per variable or for the whole
+    dataset.
 License: EUPL
 URL: https://github.com/markvanderloo/synthesizer
-Imports: stats, randomForest, parallel
+Imports: stats, randomForest
 VignetteBuilder: simplermarkdown
 Depends: R (>= 3.5.0)
 Suggests: tinytest, simplermarkdown
