@@ -48,6 +48,8 @@ expect_silent(make_synthesizer(c(1,NA,2,NA,NA)))
 expect_equal(synthesize(rep(NA_real_,3)),rep(NA_real_,3))
 expect_equal(synthesize(rep(NA,3)),rep(NA,3))
 
+
+
 # test correlation between NA and obserevd values
 rl <-data.frame( x = c(rnorm(50,mean=10), rnorm(50,mean=-10))
                , y = c(rep(NA_real_,50), rnorm(50)))
@@ -73,6 +75,15 @@ s1 <- synthesize(d, rankcor=c("z"=0.5))
 expect_true(cor(d$z,s$z)<=0.5)
 
 
+# test na.rm 
+d <- data.frame(
+   x = rnorm(100)
+ , y = sample(letters, 100,replace=TRUE)
+ , z = as.factor(sample(letters,100,replace=TRUE))
+ , v = as.integer(sample(1:100,100, replace=TRUE)))
+A <- matrix(sample(c(TRUE, FALSE), 4*100, replace=TRUE),nrow=100)
+d[A] <- NA
+expect_equal(sum(is.na(synthesize(d,na.rm=TRUE))),0)
 
 
 
