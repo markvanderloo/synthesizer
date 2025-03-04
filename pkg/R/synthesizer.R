@@ -32,8 +32,10 @@ make_synthesizer <- function(x,...){
 }
 
 #' @rdname make_synthesizer
+#' @param na.rm \code{[logical]} Remove missing values before creating a synthesizer
 #' @export
-make_synthesizer.numeric <- function(x,...){
+make_synthesizer.numeric <- function(x,na.rm=FALSE,...){
+  if (isTRUE(na.rm)) x <- x[!is.na(x)]
   if (sum(!is.na(x))<2){
     return(function(n,...) rep(NA_real_,n))
   }
@@ -50,7 +52,8 @@ make_synthesizer.numeric <- function(x,...){
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.integer <- function(x,...){
+make_synthesizer.integer <- function(x,na.rm=FALSE,...){
+  if (isTRUE(na.rm)) x <- x[!is.na(x)]
   R <- make_synthesizer(as.double(x))
   function(n,...) as.integer( round(R(n)) )
 }
@@ -58,20 +61,23 @@ make_synthesizer.integer <- function(x,...){
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.logical <- function(x,...){
+make_synthesizer.logical <- function(x,na.rm=FALSE,...){
+  if (isTRUE(na.rm)) x <- x[!is.na(x)]
   function(n,...) sample(x, n, replace=TRUE)
 }
 
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.factor <- function(x,...){
+make_synthesizer.factor <- function(x,na.rm=FALSE,...){
+  if (isTRUE(na.rm)) x <- x[!is.na(x)]
   function(n,...) sample(x, n, replace=TRUE)
 }
 
 #' @rdname make_synthesizer
 #' @export
-make_synthesizer.character <- function(x,...){
+make_synthesizer.character <- function(x,na.rm=FALSE,...){
+  if (isTRUE(na.rm)) x <- x[!is.na(x)]
   function(n,...) sample(x, n, replace=TRUE)
 }
 
@@ -112,8 +118,8 @@ decor <- function(r, rho){
 }
 
 
-make_decorrelating_synthesizer <- function(x){
-  f <- make_synthesizer(x)
+make_decorrelating_synthesizer <- function(x, na.rm){
+  f <- make_synthesizer(x, na.rm=na.rm)
 
   r <- rank(x)
   m <- length(x)  
@@ -162,9 +168,9 @@ get_rcors <- function(varnames, rankcor){
 #' @rdname make_synthesizer
 #'
 #' @export
-make_synthesizer.data.frame <- function(x,...){
+make_synthesizer.data.frame <- function(x,na.rm=FALSE,...){
   
-  L <- lapply(x, make_decorrelating_synthesizer)
+  L <- lapply(x, make_decorrelating_synthesizer,na.rm=na.rm)
   m <- NROW(x)
   varnames <- names(x)
   function(n, rankcor=1,...){
@@ -231,7 +237,7 @@ make_synthesizer.data.frame <- function(x,...){
 #'
 #' @family synthesis
 #' @export
-synthesize <- function(x, n=NROW(x), rankcor=1) make_synthesizer(x)(n,rankcor)
+synthesize <- function(x, na.rm=FALSE, n=NROW(x), rankcor=1) make_synthesizer(x,na.rm=na.rm)(n,rankcor)
 
 
 
