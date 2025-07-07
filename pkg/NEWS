@@ -1,4 +1,6 @@
 version 0.5.0
+- fix: synthesize.data.frame would sometimes crash in the case of many ties
+  and rankcor < 1.0. (Thanks to Inês Rodrigues de Sá for reporting).
 - Added na.rm argument to avoid synthesizing missing values
 - Improved documentation and reorganized code internally.
 - Removed 'pMSE()' as it is out of scope for this package, and offered by other

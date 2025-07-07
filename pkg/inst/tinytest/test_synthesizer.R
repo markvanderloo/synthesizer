@@ -86,5 +86,11 @@ d[A] <- NA
 expect_equal(sum(is.na(synthesize(d,na.rm=TRUE))),0)
 
 
+# regression test for tie handling (errors for versions < 0.4.1)
+
+expect_silent(synthesize(data.frame(X=1:10,Y=rep(1,10)),rankcor=0.5))
+
+
+
 
 

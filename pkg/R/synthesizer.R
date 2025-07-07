@@ -121,7 +121,7 @@ decor <- function(r, rho){
 make_decorrelating_synthesizer <- function(x, na.rm){
   f <- make_synthesizer(x, na.rm=na.rm)
 
-  r <- rank(x)
+  r <- rank(x, ties.method="first")
   m <- length(x)  
 
   function(n=m, rho=1, ii=NULL){
