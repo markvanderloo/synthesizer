@@ -199,6 +199,8 @@ make_synthesizer.data.frame <- function(x,na.rm=FALSE,...){
 #'
 #' @param x \code{[vector|data.frame]} data to synthesize.
 #' @param n \code{[integer]} Number of values or records to synthesize.
+#' @param na.rm \code{[logical]} Remove missing values before creating a synthesizer.
+#'        Set to \code{TRUE} to avoid synthesizing missing values.      
 #' @param rankcor \code{[numeric]} in \eqn{[0,1]}. Either a single rank correlation
 #'        value that is applied to all variables, or a vector of the form
 #'        \code{c(variable1=ut1lity1,...)}. Variables not explicitly mentioned
